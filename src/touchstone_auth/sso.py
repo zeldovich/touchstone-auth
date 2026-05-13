@@ -95,7 +95,8 @@ class TouchstoneSession:
         verbose:bool=False,
         *,
         auth_type:Optional[Union[CertificateAuth,UsernamePassAuth,KerberosAuth]]=None,
-        autosave_cookies:bool=True) -> None:
+        autosave_cookies:bool=True,
+        base_session:Optional[requests.Session]=None) -> None:
         """
         Creates a new Touchstone session.
 
@@ -114,9 +115,15 @@ class TouchstoneSession:
         auth_type: Determines the type of authentication to use. Pass an enum type.
         autosave_cookies: If cookies should be automatically re-saved back to the same cookiejar file
             when the session is closed.
+        base_session: Optional requests.Session object that should be used for any
+            requests issued while setting up the Touchstone session; useful if the
+            target URL requires some tweaks to the requests session object.
         """
 
-        self._session: requests.Session = requests.Session()
+        if base_session is None:
+            self._session: requests.Session = requests.Session()
+        else:
+            self._session: requests.Session = base_session
         self._base_url = base_url
         if auth_type is not None:
             # Check for invalid behavior
